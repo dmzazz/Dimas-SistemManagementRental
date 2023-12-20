@@ -1,0 +1,28 @@
+GET http://localhost:8000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5hbWUiOiJEaW1hcyIsImlhdCI6MTY5Nzk4MTg3MSwiZXhwIjoxNjk3OTgxODg2fQ.wwYHwfZrX2xd-4S1r_otyjpaPql24wxBzEkLsxiU4q8
+
+###
+POST http://localhost:8000/users
+Content-Type: application/json
+
+{
+    "name": "admin",
+    "username": "admin",
+    "password": "admin123",
+    "confirmPassword": "admin123"
+}
+
+###
+POST http://localhost:8000/login
+Content-Type: application/json
+
+{
+    "username" : "dmzazz",
+    "password" : "123456"
+}
+
+###
+GET http://localhost:8000/token
+
+###
+DELETE http://localhost:8000/logout

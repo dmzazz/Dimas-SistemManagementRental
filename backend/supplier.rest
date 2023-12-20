@@ -1,0 +1,29 @@
+GET http://localhost:8000/supplier
+
+###
+GET http://localhost:8000/supplier/1
+
+###
+POST http://localhost:8000/supplier
+Content-Type: application/json
+
+{
+    "person_name": "Dimas Azi",
+    "email": "dims@gml.com",
+    "phone": "089601768642",
+    "address": "Jln. raya sks"
+}
+
+###
+PATCH http://localhost:8000/supplier/1
+Content-Type: application/json
+
+{
+    "person_name": "Azizir",
+    "email": "dimas@gmail.com",
+    "phone": "089601768642",
+    "address": "Jln. raya sks"
+}
+
+###
+DELETE http://localhost:8000/supplier/5
