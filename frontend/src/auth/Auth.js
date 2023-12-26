@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-import { useNavigate } from "react-router-dom";
-import Auth from "../auth/Auth";
 
-// Import React Icon
-import { BsBoxSeamFill } from "react-icons/bs";
-
-const Dashboard = () => {
+const Auth = () => {
   const [token, setToken] = useState("");
   const [expire, setExpire] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,9 +22,11 @@ const Dashboard = () => {
         },
       });
       setToken(response.data.accessToken);
+      console.log(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
     } catch (error) {
+      console.log(error.response);
       if (error.response) {
         navigate("/Login");
       }
@@ -52,27 +51,6 @@ const Dashboard = () => {
       return Promise.reject(error);
     }
   );
-  return (
-    <>
-    <Auth/>
-      <div className="w-full h-full">
-        <div className="flex">
-          <div className="w-max h-max bg-[#fff] p-2 m-2 rounded-md shadow-lg">
-            <span className="text-[#29A19C] text-xl font-bold">9</span>
-            <p className="text-sm text-[#bbb] font-medium">Total Inventory</p>
-          </div>
-          <div className="w-max h-max bg-[#fff] p-2 m-2 rounded-md shadow-lg">
-            <span className="text-[#489CC1] text-xl font-bold">9</span>
-            <p className="text-sm text-[#bbb] font-medium">Total Order</p>
-          </div>
-          <div className="w-max h-max bg-[#fff] p-2 m-2 rounded-md shadow-lg">
-            <span className="text-[#28CC9E] text-xl font-bold">5</span>
-            <p className="text-sm text-[#bbb] font-medium">Total Supplier</p>
-          </div>
-        </div>
-      </div>
-    </>
-  );
 };
 
-export default Dashboard;
+export default Auth;

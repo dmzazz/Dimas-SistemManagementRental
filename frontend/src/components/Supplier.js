@@ -23,6 +23,7 @@ import Fade from "@mui/material/Fade";
 import Typography from "@mui/material/Typography";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
+import Auth from "../auth/Auth";
 
 const Supplier = () => {
   const [data, setData] = useState(null); //fetchdata
@@ -273,6 +274,7 @@ const Supplier = () => {
 
   return (
     <>
+      <Auth />
       <div className="h-full">
         <div className="bg-white w-11/12 mx-auto mt-10 border rounded">
           <div className="flex justify-between items-center p-3">
@@ -313,8 +315,14 @@ const Supplier = () => {
                           <TableCell>{row.phone}</TableCell>
                           <TableCell>{row.address}</TableCell>
                           <TableCell className="whitespace-nowrap">
-                            <button onClick={() => handleEdit(row.id)} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">Edit</button>
-                            <button onClick={() => handleDelete(row.id)} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">Delete</button>
+                            <div className="flex">
+                              <button onClick={() => handleEdit(row.id)} className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">
+                                Edit
+                              </button>
+                              <button onClick={() => handleDelete(row.id)} className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">
+                                Delete
+                              </button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       );

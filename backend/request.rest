@@ -1,5 +1,5 @@
 GET http://localhost:8000/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5hbWUiOiJEaW1hcyIsImlhdCI6MTY5Nzk4MTg3MSwiZXhwIjoxNjk3OTgxODg2fQ.wwYHwfZrX2xd-4S1r_otyjpaPql24wxBzEkLsxiU4q8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsIm5hbWUiOiJhZG1pbiIsInVzZXJuYW1lIjoiYWRtaW4iLCJpYXQiOjE3MDM1NzUxODMsImV4cCI6MTcwMzU3NTIwM30.aGmIZbAz-L6P3RBni_GssKXyobJWns5U-e98R-NmjGY
 
 ###
 POST http://localhost:8000/users
@@ -17,8 +17,8 @@ POST http://localhost:8000/login
 Content-Type: application/json
 
 {
-    "username" : "dmzazz",
-    "password" : "123456"
+    "username" : "admin",
+    "password" : "admin123"
 }
 
 ###

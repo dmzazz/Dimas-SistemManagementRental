@@ -22,6 +22,7 @@ import Fade from "@mui/material/Fade";
 import Typography from "@mui/material/Typography";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
+import Auth from "../auth/Auth";
 
 const Order = () => {
   const columns = [
@@ -259,6 +260,7 @@ const Order = () => {
 
   return (
     <>
+    <Auth/>
       <div className="h-full">
         <div className="bg-white w-11/12 mx-auto mt-10 border rounded">
           <div className="flex justify-between items-center p-3">

@@ -35,6 +35,7 @@ const Login = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log(response)
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
