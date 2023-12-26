@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 // Import from Material UI
 import { Paper } from "@mui/material";
@@ -24,6 +25,132 @@ import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 
 const Supplier = () => {
+  const [data, setData] = useState(null); //fetchdata
+  const [fetchStatus, setFetchStatus] = useState(true); //indikator
+  const [currentId, setCurrentId] = useState(-1);
+
+  // Handling Input
+  const [input, setInput] = useState({
+    person_name: "",
+    email: "",
+    phone: "",
+    address: "",
+  });
+
+  const handleInput = (e) => {
+    let name = e.target.name;
+    let value = e.target.value;
+
+    setInput({ ...input, [name]: value });
+  };
+
+  // Handling Submit
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    let { person_name, email, phone, address } = input;
+
+    try {
+      if (currentId === -1) {
+        // Create Data
+        const result = await axios.post("http://localhost:8000/supplier", { person_name, email, phone, address });
+        setFetchStatus(true);
+        console.log(result.data);
+        // setSuccess(result.data.message);
+        // setTimeout(() => {
+        //   // setSuccess(null);
+        // }, 4000);
+      } else {
+        // Update Data
+        const result = await axios.put(`http://localhost:8000/supplier/${currentId}`, { person_name, email, phone, address });
+        setFetchStatus(true);
+        console.log(result.data);
+        // setSuccess(result.data.message);
+        // setTimeout(() => {
+        //   // setSuccess(null);
+        // }, 4000);
+      }
+
+      setInput({
+        person_name: "",
+        email: "",
+        phone: "",
+        address: "",
+      });
+
+      setCurrentId(-1);
+    } catch (error) {
+      if (error.response) {
+        const errorMessage = error.response.data;
+        console.log(errorMessage);
+        // setErrorName(errorMessage.messageName);
+        // setErrorEmail(errorMessage.messageEmail);
+        // setErrorPhone(errorMessage.messagePhone);
+        // setTimeout(() => {
+        //   setErrorName(null);
+        //   setErrorEmail(null);
+        //   setErrorPhone(null);
+        // }, 2000);
+      }
+    }
+  };
+
+  useEffect(() => {
+    let fetchData = async () => {
+      try {
+        let result = await axios.get("http://localhost:8000/supplier");
+        setData(result.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (fetchStatus) {
+      fetchData();
+      setFetchStatus(false);
+    }
+  }, [fetchStatus, setFetchStatus]);
+
+  // Handling Edit
+  const [edit, setEdit] = useState(false);
+
+  const handleEdit = async (id) => {
+    console.log(id);
+
+    try {
+      const res = await axios.get(`http://localhost:8000/supplier/${id}`);
+      // setShowModal(true);
+      handleOpen();
+      setCurrentId(res.data.id);
+      setInput({ ...input, person_name: res.data.person_name, email: res.data.email, phone: res.data.phone, address: res.data.address });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Handling Delete
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8000/supplier/${id}`);
+      setFetchStatus(true);
+      // swal({
+      //   title: "Are you sure?",
+      //   text: "You want to delete this item? this process cannot be undone",
+      //   icon: "warning",
+      //   dangerMode: true,
+      //   buttons: true,
+      // }).then((willDelete) => {
+      //   if (willDelete) {
+      //     setFetchStatus(true);
+      //     swal("Item Deleted Successfully", {
+      //       icon: "success",
+      //     });
+      //   } else {
+      //   }
+      // });
+    } catch {}
+  };
+
   const columns = [
     { id: "no", label: "NO", minWidth: 70 },
     { id: "namePerson", label: "Name Person", minWidth: 130 },
@@ -54,68 +181,68 @@ const Supplier = () => {
     },
   ];
 
-  function createData(no, namePerson, email, phone, address, nameSupplier, action) {
-    return { no, namePerson, email, phone, address, nameSupplier, action };
-  }
+  // function createData(no, namePerson, email, phone, address, nameSupplier, action) {
+  //   return { no, namePerson, email, phone, address, nameSupplier, action };
+  // }
 
-  const rows = [
-    createData(
-      "1",
-      "Dimas Azizir",
-      "dimasazizir@mail.com",
-      "089601768888",
-      "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Kec. Cikarang Utara, Kabupaten Bekasi, Jawa Barat 17530",
-      "Indosat",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
-    createData(
-      "2",
-      "Owi",
-      "owi@mail.com",
-      "089787776666",
-      "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Kec. Cikarang Utara, Kabupaten Bekasi, Jawa Barat 17530",
-      "Telkomsel",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
-    createData(
-      "3",
-      "Rakabuming",
-      "rakabuming@mail.com",
-      "089987789999",
-      "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Kec. Cikarang Utara, Kabupaten Bekasi, Jawa Barat 17530",
-      "XL",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
-    createData(
-      "4",
-      "Saturn",
-      "saturn@mail.com",
-      "099987876666",
-      "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Kec. Cikarang Utara, Kabupaten Bekasi, Jawa Barat 17530",
-      "Agen Jababeka",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
-  ];
+  // const rows = [
+  //   createData(
+  //     "1",
+  //     "Dimas Azizir",
+  //     "dimasazizir@mail.com",
+  //     "089601768888",
+  //     "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Kec. Cikarang Utara, Kabupaten Bekasi, Jawa Barat 17530",
+  //     "Indosat",
+  //     <>
+  //       <div className="flex">
+  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
+  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
+  //       </div>
+  //     </>
+  //   ),
+  //   createData(
+  //     "2",
+  //     "Owi",
+  //     "owi@mail.com",
+  //     "089787776666",
+  //     "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Kec. Cikarang Utara, Kabupaten Bekasi, Jawa Barat 17530",
+  //     "Telkomsel",
+  //     <>
+  //       <div className="flex">
+  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
+  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
+  //       </div>
+  //     </>
+  //   ),
+  //   createData(
+  //     "3",
+  //     "Rakabuming",
+  //     "rakabuming@mail.com",
+  //     "089987789999",
+  //     "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Kec. Cikarang Utara, Kabupaten Bekasi, Jawa Barat 17530",
+  //     "XL",
+  //     <>
+  //       <div className="flex">
+  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
+  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
+  //       </div>
+  //     </>
+  //   ),
+  //   createData(
+  //     "4",
+  //     "Saturn",
+  //     "saturn@mail.com",
+  //     "099987876666",
+  //     "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Kec. Cikarang Utara, Kabupaten Bekasi, Jawa Barat 17530",
+  //     "Agen Jababeka",
+  //     <>
+  //       <div className="flex">
+  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
+  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
+  //       </div>
+  //     </>
+  //   ),
+  // ];
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -176,24 +303,26 @@ const Supplier = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    return (
-                      <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                        {columns.map((column) => {
-                          const value = row[column.id];
-                          return (
-                            <TableCell key={column.id} align={column.align} className="border">
-                              {column.format && typeof value === "number" ? column.format(value) : value}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  })}
+                  {data &&
+                    data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => {
+                      return (
+                        <TableRow key={row.id}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>{row.person_name}</TableCell>
+                          <TableCell>{row.email}</TableCell>
+                          <TableCell>{row.phone}</TableCell>
+                          <TableCell>{row.address}</TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            <button onClick={() => handleEdit(row.id)} className="w-10 bg-[#3C84AB] mr-2 p-2 rounded hover:bg-[#6096B4] focus:outline-none">Edit</button>
+                            <button onClick={() => handleDelete(row.id)} className="w-10 bg-[#EB455F] p-2 rounded hover:bg-[#C92C6D] focus:outline-none">Delete</button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                 </TableBody>
               </Table>
             </TableContainer>
-            <TablePagination rowsPerPageOptions={[5, 10, 25, 100]} component="div" count={rows.length} rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} />
+            <TablePagination rowsPerPageOptions={[5, 10, 25, 100]} component="div" count={columns.length} rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} />
           </Paper>
         </div>
       </div>
@@ -220,46 +349,25 @@ const Supplier = () => {
               </Typography>
 
               {/* Input Form */}
-              <div className="flex flex-wrap px-2">
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField label="NO" id="outlined-start-adornment" sx={{ m: 1, width: "10ch" }} />
-                </Typography>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField label="Name Person" id="outlined-start-adornment" sx={{ m: 1, width: "61ch" }} />
-                </Typography>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField label="Email" id="outlined-start-adornment" sx={{ m: 1, width: "10ch" }} />
-                </Typography>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField
-                    label="Phone"
-                    id="outlined-start-adornment"
-                    sx={{ m: 1, width: "41ch" }}
-                    InputProps={{
-                      startAdornment: <InputAdornment position="start">Rp.</InputAdornment>,
-                    }}
-                  />
-                </Typography>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField
-                    label="Address"
-                    id="outlined-start-adornment"
-                    sx={{ m: 1, width: "42ch" }}
-                    InputProps={{
-                      startAdornment: <InputAdornment position="start">Rp.</InputAdornment>,
-                    }}
-                  />
-                </Typography>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField label="Name Supplier" id="outlined-start-adornment" sx={{ m: 1, width: "41ch" }} />
-                </Typography>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField label="Supplier" id="outlined-start-adornment" sx={{ m: 1, width: "42ch" }} />
-                </Typography>
-              </div>
-              <Button size="large" sx={{ backgroundColor: "#28CC9E", color: "#fff", marginTop: 1, marginBottom: 2, marginRight: 3, float: "right", ":hover": { backgroundColor: "#9FF9C1" } }}>
-                Submit
-              </Button>
+              <form onSubmit={handleSubmit}>
+                <div className="flex flex-wrap px-2">
+                  <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+                    <TextField onChange={handleInput} value={input.person_name} name="person_name" label="Name Person" id="outlined-start-adornment" type="text" sx={{ m: 1, width: "41ch" }} required />
+                  </Typography>
+                  <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+                    <TextField onChange={handleInput} value={input.email} name="email" label="Email" id="outlined-start-adornment" type="text" sx={{ m: 1, width: "41ch" }} required />
+                  </Typography>
+                  <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+                    <TextField onChange={handleInput} value={input.phone} name="phone" label="Phone" id="outlined-start-adornment" type="number" sx={{ m: 1, width: "41ch" }} required />
+                  </Typography>
+                  <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+                    <TextField onChange={handleInput} value={input.address} name="address" label="Address" id="outlined-start-adornment" type="text" sx={{ m: 1, width: "42ch" }} required />
+                  </Typography>
+                </div>
+                <Button type="submit" size="large" sx={{ backgroundColor: "#28CC9E", color: "#fff", marginTop: 1, marginBottom: 2, marginRight: 3, float: "right", ":hover": { backgroundColor: "#9FF9C1" } }}>
+                  Submit
+                </Button>
+              </form>
             </Box>
           </Fade>
         </Modal>

@@ -30,7 +30,7 @@ router.delete("/product/:id", deleteProduct);
 router.get("/supplier", getSupplier);
 router.get("/supplier/:id", getSupplierById);
 router.post("/supplier", createSupplier);
-router.patch("/supplier/:id", updateSupplier);
+router.put("/supplier/:id", updateSupplier);
 router.delete("/supplier/:id", deleteSupplier);
 
 export default router;

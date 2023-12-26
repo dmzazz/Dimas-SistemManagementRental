@@ -1,7 +1,7 @@
 GET http://localhost:8000/supplier
 
 ###
-GET http://localhost:8000/supplier/1
+GET http://localhost:8000/supplier/6
 
 ###
 POST http://localhost:8000/supplier
@@ -15,14 +15,14 @@ Content-Type: application/json
 }
 
 ###
-PATCH http://localhost:8000/supplier/1
+PUT http://localhost:8000/supplier/9
 Content-Type: application/json
 
 {
-    "person_name": "Azizir",
-    "email": "dimas@gmail.com",
-    "phone": "089601768642",
-    "address": "Jln. raya sks"
+    "person_name": "raka",
+    "email": "dimssas@gmail.com",
+    "phone": "089531768642",
+    "address": "Jln. raya s"
 }
 
 ###

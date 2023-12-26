@@ -69,15 +69,18 @@ export const createSupplier = async (req, res) => {
 // Mengupdate Data Supplier
 export const updateSupplier = async (req, res) => {
   try {
-    await Supplier.update(req.body, {
+    const [updatedRowsCount] = await Supplier.update(req.body, {
       where: { id: req.params.id },
     });
-    if (!supplier) {
-      res.status(404).json({ msg: "Supplier not found" });
+
+    if (updatedRowsCount === 0) {
+      return res.status(404).json({ msg: "Supplier not found" });
     }
+
     res.status(200).json({ msg: "Supplier Updated" });
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
+    res.status(500).json({ msg: "Internal Server Error" });
   }
 };
 
