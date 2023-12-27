@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 // Import from Material UI
 import { Paper } from "@mui/material";
@@ -20,215 +22,160 @@ import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import Typography from "@mui/material/Typography";
-import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
 import Auth from "../auth/Auth";
+import { formatRupiah } from "../utils";
 
 const Order = () => {
+  const [data, setData] = useState(null); //fetchdata
+  const [fetchStatus, setFetchStatus] = useState(true); //indikator
+  const [products, setProducts] = useState([]);
+
+  const handleChangeProduct = (e) => {
+    const product = products.find((p) => p.id === e.target.value);
+    setInput({
+      ...input,
+      productId: product.id,
+      productPrice: product.sellingPrice,
+    });
+  };
+
+  // Handling Input
+  const [input, setInput] = useState({
+    productId: "",
+    productPrice: 0,
+    qty: "",
+  });
+
+  const handleInput = (e) => {
+    let name = e.target.name;
+    let value = e.target.value;
+
+    setInput({ ...input, [name]: value });
+  };
+
+  // Handling Submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // Create Data
+      await axios.post("http://localhost:8000/order", input);
+      setFetchStatus(true);
+      setInput({
+        productId: "",
+        productPrice: 0,
+        qty: "",
+      })
+      handleClose()
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    let fetchData = async () => {
+      try {
+        let result = await axios.get("http://localhost:8000/order");
+        setData(result.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (fetchStatus) {
+      fetchData();
+      setFetchStatus(false);
+    }
+  }, [fetchStatus, setFetchStatus]);
+
+  useEffect(() => {
+    let fetchData = async () => {
+      try {
+        let result = await axios.get("http://localhost:8000/product");
+        setProducts(result.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleConfirm = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to confirm this order ?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ok",
+    }).then(async (res) => {
+      if (res.isConfirmed) {
+        try {
+          await axios.get(`http://localhost:8000/order/confirm/${id}`);
+          setFetchStatus(true);
+        } catch (error) {
+          Swal.fire({
+            title: "Error",
+            text: error?.response?.data?.msg || "error",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
+  // Handling Delete
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to delete this order? this process cannot be undone",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ok",
+    }).then(async (res) => {
+      if (res.isConfirmed) {
+        await axios.delete(`http://localhost:8000/order/${id}`);
+        setFetchStatus(true);
+      }
+    });
+  };
+
   const columns = [
-    { id: "id", label: "ID", minWidth: 70 },
-    { id: "name", label: "Name", minWidth: 100 },
     {
-      id: "quantity",
-      label: "Quantity",
+      id: "code",
+      label: "ID",
       minWidth: 70,
     },
     {
-      id: "purchasePrice",
-      label: "Purchase Price",
+      id: "product",
+      label: "Name",
       minWidth: 100,
     },
     {
-      id: "sellingPrice",
-
-      label: "Selling Price",
-      minWidth: 100,
+      id: "price",
+      label: "Price",
+      minWidth: 70,
     },
     {
-      id: "category",
-      label: "Category",
-      minWidth: 100,
+      id: "qty",
+      label: "Qty",
+      minWidth: 70,
     },
     {
-      id: "supplier",
-      label: "Supplier",
-      minWidth: 100,
-    },
-    {
-      id: "entryDate",
-      label: "Entry Date",
-      minWidth: 100,
-    },
-    {
-      id: "changeDate",
-      label: "Change Date",
-      minWidth: 100,
+      id: "total",
+      label: "Total",
+      minWidth: 70,
     },
     {
       id: "action",
       label: "Action",
       minWidth: 100,
     },
-  ];
-
-  function createData(id, name, quantity, purchasePrice, sellingPrice, category, supplier, entryDate, changeDate, action) {
-    return { id, name, quantity, purchasePrice, sellingPrice, category, supplier, entryDate, changeDate, action };
-  }
-
-  const rows = [
-    createData(
-      "PI001",
-      "Indosat",
-      100,
-      "Rp10.000",
-      "Rp15.000",
-      "Perdana Indosat",
-      "Indosat",
-      "17 March 2023, 7:13 PM",
-      "18 March 2023, 10:13 PM",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#29A19C] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#47D6B6] hover:cursor-pointer duration-300">Confirm</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
-    createData(
-      "PI002",
-      "Indosat",
-      100,
-      "Rp10.000",
-      "Rp15.000",
-      "Perdana Indosat",
-      "Indosat",
-      "17 March 2023, 7:13 PM",
-      "18 March 2023, 10:13 PM",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#29A19C] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#47D6B6] hover:cursor-pointer duration-300">Confirm</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
-    createData(
-      "PI003",
-      "Indosat",
-      100,
-      "Rp10.000",
-      "Rp15.000",
-      "Perdana Indosat",
-      "Indosat",
-      "17 March 2023, 7:13 PM",
-      "18 March 2023, 10:13 PM",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#29A19C] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#47D6B6] hover:cursor-pointer duration-300">Confirm</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
-    createData(
-      "PT001",
-      "Telkomsel",
-      100,
-      "Rp10.000",
-      "Rp15.000",
-      "Perdana Telkomsel",
-      "Telkomsel",
-      "17 March 2023, 7:13 PM",
-      "18 March 2023, 10:13 PM",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#29A19C] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#47D6B6] hover:cursor-pointer duration-300">Confirm</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
-    createData(
-      "PT001",
-      "Telkomsel",
-      100,
-      "Rp10.000",
-      "Rp15.000",
-      "Perdana Telkomsel",
-      "Telkomsel",
-      "17 March 2023, 7:13 PM",
-      "18 March 2023, 10:13 PM",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#29A19C] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#47D6B6] hover:cursor-pointer duration-300">Confirm</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
-    createData(
-      "PT001",
-      "Telkomsel",
-      100,
-      "Rp10.000",
-      "Rp15.000",
-      "Perdana Telkomsel",
-      "Telkomsel",
-      "17 March 2023, 7:13 PM",
-      "18 March 2023, 10:13 PM",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#29A19C] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#47D6B6] hover:cursor-pointer duration-300">Confirm</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
-    createData(
-      "VI001",
-      "Indosat",
-      100,
-      "Rp10.000",
-      "Rp15.000",
-      "Voucher Indosat",
-      "Indosat",
-      "17 March 2023, 7:13 PM",
-      "18 March 2023, 10:13 PM",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#29A19C] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#47D6B6] hover:cursor-pointer duration-300">Confirm</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
-    createData(
-      "VI001",
-      "Indosat",
-      100,
-      "Rp10.000",
-      "Rp15.000",
-      "Voucher Indosat",
-      "Indosat",
-      "17 March 2023, 7:13 PM",
-      "18 March 2023, 10:13 PM",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#29A19C] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#47D6B6] hover:cursor-pointer duration-300">Confirm</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
-    createData(
-      "VI001",
-      "Indosat",
-      100,
-      "Rp10.000",
-      "Rp15.000",
-      "Voucher Indosat",
-      "Indosat",
-      "17 March 2023, 7:13 PM",
-      "18 March 2023, 10:13 PM",
-      <>
-        <div className="flex">
-          <button className="flex items-center bg-[#29A19C] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#47D6B6] hover:cursor-pointer duration-300">Confirm</button>
-          <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-        </div>
-      </>
-    ),
   ];
 
   const [page, setPage] = useState(0);
@@ -260,7 +207,7 @@ const Order = () => {
 
   return (
     <>
-    <Auth/>
+      <Auth />
       <div className="h-full">
         <div className="bg-white w-11/12 mx-auto mt-10 border rounded">
           <div className="flex justify-between items-center p-3">
@@ -269,8 +216,14 @@ const Order = () => {
 
             {/* Right */}
             <div className="flex">
-              <input type="search" className="border-2 border-[#A9A9A9] rounded-md p-1 mr-2 focus:border-black focus:outline-none"></input>
-              <button onClick={handleOpen} className="flex items-center bg-[#489CC1] text-white p-2 rounded-lg hover:bg-[#17B3C1] hover:cursor-pointer duration-300">
+              <input
+                type="search"
+                className="border-2 border-[#A9A9A9] rounded-md p-1 mr-2 focus:border-black focus:outline-none"
+              ></input>
+              <button
+                onClick={handleOpen}
+                className="flex items-center bg-[#489CC1] text-white p-2 rounded-lg hover:bg-[#17B3C1] hover:cursor-pointer duration-300"
+              >
                 <RiAddBoxLine size={22} className="mr-1" />
                 Add Order
               </button>
@@ -284,31 +237,66 @@ const Order = () => {
                 <TableHead>
                   <TableRow>
                     {columns.map((column) => (
-                      <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }} sx={{ backgroundColor: "#489CC1" }} className="border border-slate-300">
+                      <TableCell
+                        key={column.id}
+                        align={column.align}
+                        style={{ minWidth: column.minWidth }}
+                        sx={{ backgroundColor: "#489CC1" }}
+                        className="border border-slate-300"
+                      >
                         {column.label}
                       </TableCell>
                     ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    return (
-                      <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                        {columns.map((column) => {
-                          const value = row[column.id];
-                          return (
-                            <TableCell key={column.id} align={column.align} className="border">
-                              {column.format && typeof value === "number" ? column.format(value) : value}
+                  {/*
+                   */}
+                  {data &&
+                    data
+                      .slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      .map((row) => {
+                        return (
+                          <TableRow key={row.id}>
+                            <TableCell>{row.code}</TableCell>
+                            <TableCell>{row.product.name}</TableCell>
+                            <TableCell>{formatRupiah(row.price)}</TableCell>
+                            <TableCell>{row.qty}</TableCell>
+                            <TableCell>{formatRupiah(row.total)}</TableCell>
+                            <TableCell className="whitespace-nowrap">
+                              <div className="flex">
+                                <button
+                                  onClick={() => handleConfirm(row.id)}
+                                  className="flex items-center bg-[#29A19C] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#47D6B6] hover:cursor-pointer duration-300"
+                                >
+                                  Confirm
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(row.id)}
+                                  className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300"
+                                >
+                                  Delete
+                                </button>
+                              </div>
                             </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  })}
+                          </TableRow>
+                        );
+                      })}
                 </TableBody>
               </Table>
             </TableContainer>
-            <TablePagination rowsPerPageOptions={[5, 10, 25, 100]} component="div" count={rows.length} rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} />
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, 100]}
+              component="div"
+              count={data?.length || 0}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
           </Paper>
         </div>
       </div>
@@ -330,51 +318,78 @@ const Order = () => {
         >
           <Fade in={open}>
             <Box sx={styleModalForm}>
-              <Typography id="transition-modal-title" variant="h6" component="h2" sx={{ background: "#489CC1", padding: 2, color: "#fff", borderTopRightRadius: 5, borderTopLeftRadius: 5 }}>
+              <Typography
+                id="transition-modal-title"
+                variant="h6"
+                component="h2"
+                sx={{
+                  background: "#489CC1",
+                  padding: 2,
+                  color: "#fff",
+                  borderTopRightRadius: 5,
+                  borderTopLeftRadius: 5,
+                }}
+              >
                 Add Order
               </Typography>
 
               {/* Input Form */}
-              <div className="flex flex-wrap px-2">
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField label="ID" id="outlined-start-adornment" sx={{ m: 1, width: "10ch" }} />
-                </Typography>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField label="Name" id="outlined-start-adornment" sx={{ m: 1, width: "61ch" }} />
-                </Typography>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField label="Quantity" id="outlined-start-adornment" sx={{ m: 1, width: "10ch" }} />
-                </Typography>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField
-                    label="Purchase Price"
-                    id="outlined-start-adornment"
-                    sx={{ m: 1, width: "41ch" }}
-                    InputProps={{
-                      startAdornment: <InputAdornment position="start">Rp.</InputAdornment>,
-                    }}
-                  />
-                </Typography>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField
-                    label="Selling Price"
-                    id="outlined-start-adornment"
-                    sx={{ m: 1, width: "42ch" }}
-                    InputProps={{
-                      startAdornment: <InputAdornment position="start">Rp.</InputAdornment>,
-                    }}
-                  />
-                </Typography>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField label="Category" id="outlined-start-adornment" sx={{ m: 1, width: "41ch" }} />
-                </Typography>
-                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                  <TextField label="Supplier" id="outlined-start-adornment" sx={{ m: 1, width: "42ch" }} />
-                </Typography>
-              </div>
-              <Button size="large" sx={{ backgroundColor: "#489CC1", color: "#fff", marginTop: 1, marginBottom: 2, marginRight: 3, float: "right", ":hover": { backgroundColor: "#17B3C1" } }}>
-                Submit
-              </Button>
+              <form onSubmit={handleSubmit}>
+                <div className="flex flex-wrap px-2">
+                  <FormControl sx={{ m: 1, width: "53ch", mt: 3 }}>
+                    <InputLabel id="product-label">Product</InputLabel>
+                    <Select
+                      labelId="product-label"
+                      id="product"
+                      label="Agesssddddd"
+                      name="productId"
+                      onChange={handleChangeProduct}
+                      value={input.productId}
+                      required
+                    >
+                      {products.map((p) => (
+                        <MenuItem key={p.id} value={p.id}>
+                          {p.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormControl sx={{ m: 1, width: "21ch", mt: 3 }}>
+                    <TextField
+                      label="Price"
+                      id="outlined-start-adornment"
+                      value={formatRupiah(input.productPrice)}
+                      disabled
+                    />
+                  </FormControl>
+                  <FormControl sx={{ m: 1, mt: 2 }} fullWidth>
+                    <TextField
+                      label="Quantity"
+                      id="outlined-start-adornment"
+                      type="number"
+                      name="qty"
+                      onChange={handleInput}
+                      value={input.qty}
+                      required
+                    />
+                  </FormControl>
+                </div>
+                <Button
+                  type="submit"
+                  size="large"
+                  sx={{
+                    backgroundColor: "#489CC1",
+                    color: "#fff",
+                    marginTop: 1,
+                    marginBottom: 2,
+                    marginRight: 2,
+                    float: "right",
+                    ":hover": { backgroundColor: "#17B3C1" },
+                  }}
+                >
+                  Submit
+                </Button>
+              </form>
             </Box>
           </Fade>
         </Modal>

@@ -10,6 +10,9 @@ import { createProduct, deleteProduct, getProduct, getProductById, updateProduct
 // Import Supplier
 import { getSupplier, getSupplierById, createSupplier, updateSupplier, deleteSupplier } from "../controllers/SupplierController.js";
 
+// Import Ordder
+import { confirmOrder, createOrder, deleteOrder, getOrder } from "../controllers/OrderController.js";
+
 const router = express.Router();
 
 // Router Users
@@ -32,5 +35,11 @@ router.get("/supplier/:id", getSupplierById);
 router.post("/supplier", createSupplier);
 router.put("/supplier/:id", updateSupplier);
 router.delete("/supplier/:id", deleteSupplier);
+
+// Router Order
+router.get("/order", getOrder);
+router.post("/order", createOrder);
+router.get("/order/confirm/:id", confirmOrder);
+router.delete("/order/:id", deleteOrder);
 
 export default router;
