@@ -8,27 +8,27 @@ POST http://localhost:8000/product
 Content-Type: application/json
 
 {
-    "sku": "VII5GB",
-    "name": "Voucher Indosat Internet 5GB",
+    "sku": "VII10GB",
+    "name": "Voucher Indosat Internet 10GB",
     "quantity": "200",
     "purchasePrice": "10000",
     "sellingPrice": "250000",
     "category": "VOUCHER INDOSAT",
-    "supplierId": "6"
+    "supplierId": "1"
 }
 
 ###
-PATCH http://localhost:8000/product/2
+PATCH http://localhost:8000/product/18
 Content-Type: application/json
 
 {
-    "sku": "VII5GB",
-    "name": "Voucher Indosat Internet 5GB",
+    "sku": "VII10GB",
+    "name": "Voucher Indosat Internet 20GB",
     "quantity": "200",
-    "purchasePrice": "Rp10.000",
-    "sellingPrice": "Rp150",
+    "purchasePrice": "10000",
+    "sellingPrice": "250000",
     "category": "VOUCHER INDOSAT",
-    "supplierId": "6"
+    "supplierId": "1"
 }
 
 ###

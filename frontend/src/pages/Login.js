@@ -35,7 +35,7 @@ const Login = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response)
+      console.log(response);
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
@@ -107,7 +107,7 @@ const Login = () => {
         )}
       </div>
 
-      {/* Success Log9n */}
+      {/* Success Login */}
       <div className="absolute top-5 right-10">
         {success && (
           <Alert variant="filled" severity="success">

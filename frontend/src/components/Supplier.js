@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import swal from "sweetalert";
 
 // Import from Material UI
+import { Alert } from "@mui/material";
 import { Paper } from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -30,6 +32,14 @@ const Supplier = () => {
   const [fetchStatus, setFetchStatus] = useState(true); //indikator
   const [currentId, setCurrentId] = useState(-1);
 
+  // Handle Success
+  const [success, setSuccess] = useState("");
+
+  // handleError
+  const [errorName, setErrorName] = useState("");
+  const [errorEmail, setErrorEmail] = useState("");
+  const [errorPhone, setErrorPhone] = useState("");
+
   // Handling Input
   const [input, setInput] = useState({
     person_name: "",
@@ -56,20 +66,18 @@ const Supplier = () => {
         // Create Data
         const result = await axios.post("http://localhost:8000/supplier", { person_name, email, phone, address });
         setFetchStatus(true);
-        console.log(result.data);
-        // setSuccess(result.data.message);
-        // setTimeout(() => {
-        //   // setSuccess(null);
-        // }, 4000);
+        setSuccess(result.data.msg);
+        setTimeout(() => {
+          setSuccess(null);
+        }, 4000);
       } else {
         // Update Data
         const result = await axios.put(`http://localhost:8000/supplier/${currentId}`, { person_name, email, phone, address });
         setFetchStatus(true);
-        console.log(result.data);
-        // setSuccess(result.data.message);
-        // setTimeout(() => {
-        //   // setSuccess(null);
-        // }, 4000);
+        setSuccess(result.data.msg);
+        setTimeout(() => {
+          setSuccess(null);
+        }, 4000);
       }
 
       setInput({
@@ -84,14 +92,14 @@ const Supplier = () => {
       if (error.response) {
         const errorMessage = error.response.data;
         console.log(errorMessage);
-        // setErrorName(errorMessage.messageName);
-        // setErrorEmail(errorMessage.messageEmail);
-        // setErrorPhone(errorMessage.messagePhone);
-        // setTimeout(() => {
-        //   setErrorName(null);
-        //   setErrorEmail(null);
-        //   setErrorPhone(null);
-        // }, 2000);
+        setErrorName(errorMessage.msgName);
+        setErrorEmail(errorMessage.messageEmail);
+        setErrorPhone(errorMessage.messagePhone);
+        setTimeout(() => {
+          setErrorName(null);
+          setErrorEmail(null);
+          setErrorPhone(null);
+        }, 2000);
       }
     }
   };
@@ -133,23 +141,24 @@ const Supplier = () => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:8000/supplier/${id}`);
-      setFetchStatus(true);
-      // swal({
-      //   title: "Are you sure?",
-      //   text: "You want to delete this item? this process cannot be undone",
-      //   icon: "warning",
-      //   dangerMode: true,
-      //   buttons: true,
-      // }).then((willDelete) => {
-      //   if (willDelete) {
-      //     setFetchStatus(true);
-      //     swal("Item Deleted Successfully", {
-      //       icon: "success",
-      //     });
-      //   } else {
-      //   }
-      // });
-    } catch {}
+      swal({
+        title: "Are you sure?",
+        text: "You want to delete this item? this process cannot be undone",
+        icon: "warning",
+        dangerMode: true,
+        buttons: true,
+      }).then((willDelete) => {
+        if (willDelete) {
+          setFetchStatus(true);
+          swal("Item Deleted Successfully", {
+            icon: "success",
+          });
+        } else {
+        }
+      });
+    } catch (error) {
+      console.log(error.response);
+    }
   };
 
   const columns = [
@@ -169,11 +178,6 @@ const Supplier = () => {
       id: "address",
       label: "Address",
       minWidth: 100,
-    },
-    {
-      id: "nameSupplier",
-      label: "Name Supplier",
-      minWidth: 130,
     },
     {
       id: "action",
@@ -336,50 +340,65 @@ const Supplier = () => {
       </div>
 
       {/* Modal Add Supplier */}
-      <div>
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          open={open}
-          onClose={handleClose}
-          closeAfterTransition
-          slots={{ backdrop: Backdrop }}
-          slotProps={{
-            backdrop: {
-              timeout: 500,
-            },
-          }}
-        >
-          <Fade in={open}>
-            <Box sx={styleModalForm}>
-              <Typography id="transition-modal-title" variant="h6" component="h2" sx={{ background: "#28CC9E", padding: 2, color: "#fff", borderTopRightRadius: 5, borderTopLeftRadius: 5 }}>
-                Add Supplier
-              </Typography>
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={open}
+        onClose={handleClose}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={open}>
+          <Box sx={styleModalForm}>
+            {/* Success */}
+            <div className="absolute top-2 right-2">
+              {success && (
+                <Alert variant="filled" severity="success">
+                  {success}
+                </Alert>
+              )}
+            </div>
 
-              {/* Input Form */}
-              <form onSubmit={handleSubmit}>
-                <div className="flex flex-wrap px-2">
-                  <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                    <TextField onChange={handleInput} value={input.person_name} name="person_name" label="Name Person" id="outlined-start-adornment" type="text" sx={{ m: 1, width: "41ch" }} required />
-                  </Typography>
-                  <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                    <TextField onChange={handleInput} value={input.email} name="email" label="Email" id="outlined-start-adornment" type="text" sx={{ m: 1, width: "41ch" }} required />
-                  </Typography>
-                  <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                    <TextField onChange={handleInput} value={input.phone} name="phone" label="Phone" id="outlined-start-adornment" type="number" sx={{ m: 1, width: "41ch" }} required />
-                  </Typography>
-                  <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                    <TextField onChange={handleInput} value={input.address} name="address" label="Address" id="outlined-start-adornment" type="text" sx={{ m: 1, width: "42ch" }} required />
-                  </Typography>
-                </div>
-                <Button type="submit" size="large" sx={{ backgroundColor: "#28CC9E", color: "#fff", marginTop: 1, marginBottom: 2, marginRight: 3, float: "right", ":hover": { backgroundColor: "#9FF9C1" } }}>
-                  Submit
-                </Button>
-              </form>
-            </Box>
-          </Fade>
-        </Modal>
-      </div>
+            {/* Error */}
+            <div className="absolute top-2 right-2">
+              {errorName && (
+                <Alert variant="filled" severity="error">
+                  {errorName}
+                </Alert>
+              )}
+            </div>
+            <Typography id="transition-modal-title" variant="h6" component="h2" sx={{ background: "#28CC9E", padding: 2, color: "#fff", borderTopRightRadius: 5, borderTopLeftRadius: 5 }}>
+              Add Supplier
+            </Typography>
+
+            {/* Input Form */}
+            <form onSubmit={handleSubmit}>
+              <div className="flex flex-wrap px-2">
+                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+                  <TextField onChange={handleInput} value={input.person_name} name="person_name" label="Name Person" id="outlined-start-adornment" type="text" sx={{ m: 1, width: "41ch" }} required />
+                </Typography>
+                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+                  <TextField onChange={handleInput} value={input.email} name="email" label="Email" id="outlined-start-adornment" type="text" sx={{ m: 1, width: "41ch" }} required />
+                </Typography>
+                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+                  <TextField onChange={handleInput} value={input.phone} name="phone" label="Phone" id="outlined-start-adornment" type="number" sx={{ m: 1, width: "41ch" }} required />
+                </Typography>
+                <Typography id="transition-modal-description" sx={{ mt: 2 }}>
+                  <TextField onChange={handleInput} value={input.address} name="address" label="Address" id="outlined-start-adornment" type="text" sx={{ m: 1, width: "42ch" }} required />
+                </Typography>
+              </div>
+              <Button type="submit" size="large" sx={{ backgroundColor: "#28CC9E", color: "#fff", marginTop: 1, marginBottom: 2, marginRight: 3, float: "right", ":hover": { backgroundColor: "#9FF9C1" } }}>
+                Submit
+              </Button>
+            </form>
+          </Box>
+        </Fade>
+      </Modal>
     </>
   );
 };

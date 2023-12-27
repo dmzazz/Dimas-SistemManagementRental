@@ -26,4 +26,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:8000/supplier/5
+DELETE http://localhost:8000/supplier/6

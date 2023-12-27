@@ -34,3 +34,8 @@ const Order = db.define(
 Order.belongsTo(Product, {foreignKey: 'productId'})
 
 export default Order;
+
+
+// (async () => {
+//   await db.sync();
+// })();

@@ -6,13 +6,15 @@ import Product from "../models/productModel.js";
 export const getOrder = async (req, res) => {
   try {
     const order = await Order.findAll({
-      include: [{
-        model: Product,
-        attributes: ['id', 'name', 'category', 'sellingPrice']
-      }],
+      include: [
+        {
+          model: Product,
+          attributes: ["id", "name", "category", "sellingPrice"],
+        },
+      ],
       where: {
-        status: 'Pending'
-      }
+        status: "Pending",
+      },
     });
     res.status(200).json(order);
   } catch (error) {
@@ -57,22 +59,22 @@ export const createOrder = async (req, res) => {
 export const confirmOrder = async (req, res) => {
   try {
     const order = await Order.findOne({
-      where: {id: req.params.id}
-    })
+      where: { id: req.params.id },
+    });
     if (!order) {
-      return res.status(404).json({msg: 'not found'});
+      return res.status(404).json({ msg: "not found" });
     }
 
     const product = await Product.findOne({
-      where: {id: order.productId}
-    })
+      where: { id: order.productId },
+    });
 
     if (product.quantity < order.qty) {
-      return res.status(400).json({msg: "Insufficient product qty"});
+      return res.status(400).json({ msg: "Insufficient product qty" });
     }
 
-    await product.update({quantity: product.quantity - order.qty})
-    await order.update({status: 'Completed'})
+    await product.update({ quantity: product.quantity - order.qty });
+    await order.update({ status: "Completed" });
     res.status(200).json({ msg: "Confirm Order Success" });
   } catch (error) {
     console.log(error.message);
@@ -84,10 +86,10 @@ export const confirmOrder = async (req, res) => {
 export const deleteOrder = async (req, res) => {
   try {
     const order = await Order.findOne({
-      where: {id: req.params.id}
-    })
+      where: { id: req.params.id },
+    });
     if (!order) {
-      return res.status(404).json({msg: 'not found'});
+      return res.status(404).json({ msg: "not found" });
     }
 
     await order.destroy();
@@ -99,14 +101,12 @@ export const deleteOrder = async (req, res) => {
 };
 
 const generateOrderCode = async () => {
-  const now = new Date()
-  const count = await Order.count({ 
+  const now = new Date();
+  const count = await Order.count({
     where: {
-      [Op.and]: [
-        Sequelize.where(Sequelize.fn('DATE', Sequelize.col('createdAt')), now.toISOString().slice(0, 10))
-      ]
-    } 
+      [Op.and]: [Sequelize.where(Sequelize.fn("DATE", Sequelize.col("createdAt")), now.toISOString().slice(0, 10))],
+    },
   });
 
-  return 'INV' + String(now.toISOString().slice(0, 10)).replaceAll('-', '') + String(count+1).padStart(3, '0')
+  return "INV" + String(now.toISOString().slice(0, 10)).replaceAll("-", "") + String(count + 1).padStart(3, "0");
 };

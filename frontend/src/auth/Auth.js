@@ -22,11 +22,9 @@ const Auth = () => {
         },
       });
       setToken(response.data.accessToken);
-      console.log(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
     } catch (error) {
-      console.log(error.response);
       if (error.response) {
         navigate("/Login");
       }
