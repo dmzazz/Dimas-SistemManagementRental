@@ -7,6 +7,7 @@ import router from "./routes/index.js";
 import Product from "./models/productModel.js";
 import Order from "./models/orderModel.js";
 import Supplier from "./models/supplierModel.js";
+import OutboundHistory from "./models/outboundHistoryModel.js";
 
 dotenv.config();
 const app = express();
@@ -25,5 +26,6 @@ app.use(router);
 app.use(Product)
 app.use(Order)
 app.use(Supplier)
+// app.use(OutboundHistory)
 
 app.listen(8000, () => console.log("Server running at port 8000"));

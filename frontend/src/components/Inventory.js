@@ -32,12 +32,14 @@ import FormControl from "@mui/material/FormControl";
 
 // Import Auth
 import Auth from "../auth/Auth";
+import { formatRupiah } from "../utils";
 
 const Inventory = () => {
   const [data, setData] = useState(null); //fetchdata
   const [fetchSupplier, setSupplier] = useState(null); // fetch data supplier
   const [fetchStatus, setFetchStatus] = useState(true); //indikator
   const [currentId, setCurrentId] = useState(-1);
+  const [search, setSearch] = useState(""); // Search
 
   // Handle Success
   const [success, setSuccess] = useState(true);
@@ -154,7 +156,7 @@ const Inventory = () => {
       // setShowModal(true);
       handleOpen();
       setCurrentId(res.data.id);
-      setEdit(false);
+      setEdit(true);
       setInput({ ...input, sku: res.data.sku, name: res.data.name, quantity: res.data.quantity, purchasePrice: res.data.purchasePrice, sellingPrice: res.data.sellingPrice, category: res.data.category, supplierId: res.data.supplierId });
     } catch (error) {
       console.log(error);
@@ -184,6 +186,8 @@ const Inventory = () => {
       console.log(error.response);
     }
   };
+
+  const filteredData = data !== null ? data.filter((row) => (row.no && row.no.toLowerCase().includes(search.toLowerCase())) || (row.name && row.name.toLowerCase().includes(search.toLowerCase()))) : null;
 
   const columns = [
     { id: "no", label: "NO", minWidth: 70 },
@@ -232,168 +236,8 @@ const Inventory = () => {
     },
   ];
 
-  // function createData(id, name, quantity, purchasePrice, sellingPrice, category, supplier, entryDate, changeDate, action) {
-  //   return { id, name, quantity, purchasePrice, sellingPrice, category, supplier, entryDate, changeDate, action };
-  // }
-
-  // const rows = [
-  //   createData(
-  //     "PI001",
-  //     "Indosat",
-  //     100,
-  //     "Rp10.000",
-  //     "Rp15.000",
-  //     "Perdana Indosat",
-  //     "Indosat",
-  //     "17 March 2023, 7:13 PM",
-  //     "18 March 2023, 10:13 PM",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  //   createData(
-  //     "PI002",
-  //     "Indosat",
-  //     100,
-  //     "Rp10.000",
-  //     "Rp15.000",
-  //     "Perdana Indosat",
-  //     "Indosat",
-  //     "17 March 2023, 7:13 PM",
-  //     "18 March 2023, 10:13 PM",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  //   createData(
-  //     "PI003",
-  //     "Indosat",
-  //     100,
-  //     "Rp10.000",
-  //     "Rp15.000",
-  //     "Perdana Indosat",
-  //     "Indosat",
-  //     "17 March 2023, 7:13 PM",
-  //     "18 March 2023, 10:13 PM",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  //   createData(
-  //     "PT001",
-  //     "Telkomsel",
-  //     100,
-  //     "Rp10.000",
-  //     "Rp15.000",
-  //     "Perdana Telkomsel",
-  //     "Telkomsel",
-  //     "17 March 2023, 7:13 PM",
-  //     "18 March 2023, 10:13 PM",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  //   createData(
-  //     "PT001",
-  //     "Telkomsel",
-  //     100,
-  //     "Rp10.000",
-  //     "Rp15.000",
-  //     "Perdana Telkomsel",
-  //     "Telkomsel",
-  //     "17 March 2023, 7:13 PM",
-  //     "18 March 2023, 10:13 PM",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  //   createData(
-  //     "PT001",
-  //     "Telkomsel",
-  //     100,
-  //     "Rp10.000",
-  //     "Rp15.000",
-  //     "Perdana Telkomsel",
-  //     "Telkomsel",
-  //     "17 March 2023, 7:13 PM",
-  //     "18 March 2023, 10:13 PM",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  //   createData(
-  //     "VI001",
-  //     "Indosat",
-  //     100,
-  //     "Rp10.000",
-  //     "Rp15.000",
-  //     "Voucher Indosat",
-  //     "Indosat",
-  //     "17 March 2023, 7:13 PM",
-  //     "18 March 2023, 10:13 PM",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  //   createData(
-  //     "VI001",
-  //     "Indosat",
-  //     100,
-  //     "Rp10.000",
-  //     "Rp15.000",
-  //     "Voucher Indosat",
-  //     "Indosat",
-  //     "17 March 2023, 7:13 PM",
-  //     "18 March 2023, 10:13 PM",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  //   createData(
-  //     "VI001",
-  //     "Indosat",
-  //     100,
-  //     "Rp10.000",
-  //     "Rp15.000",
-  //     "Voucher Indosat",
-  //     "Indosat",
-  //     "17 March 2023, 7:13 PM",
-  //     "18 March 2023, 10:13 PM",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  // ];
-
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -430,7 +274,15 @@ const Inventory = () => {
 
             {/* Right */}
             <div className="flex">
-              <input type="search" className="border-2 border-[#A9A9A9] rounded-md p-1 mr-2 focus:border-black focus:outline-none"></input>
+              <input
+                onChange={(e) => setSearch(e.target.value)}
+                value={search}
+                type="search"
+                id="search"
+                name="search"
+                placeholder="Search..."
+                className="border-2 border-[#A9A9A9] rounded-md p-1 mr-2 focus:border-black focus:outline-none"
+              ></input>
               <button onClick={handleOpen} className="flex items-center bg-[#29A19C] text-white p-2 rounded-lg hover:bg-[#7ED7C1] hover:cursor-pointer duration-300">
                 <RiAddBoxLine size={22} className="mr-1" />
                 Add Inventory
@@ -445,24 +297,25 @@ const Inventory = () => {
                 <TableHead>
                   <TableRow>
                     {columns.map((column) => (
-                      <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }} sx={{ backgroundColor: "#28CC9E" }} className="border border-slate-300">
+                      <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }} sx={{ backgroundColor: "#29A19C" }} className="border border-slate-300">
                         {column.label}
                       </TableCell>
                     ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {data &&
-                    data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => {
-                      const supplier = fetchSupplier.find((s) => s.id === row.supplierId);
+                  {filteredData &&
+                    filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => {
+                      const supplier = fetchSupplier ? fetchSupplier.find((s) => s.id === row.supplierId) : null;
+
                       return (
                         <TableRow key={row.id}>
                           <TableCell>{index + 1}</TableCell>
                           <TableCell>{row.sku}</TableCell>
                           <TableCell>{row.name}</TableCell>
                           <TableCell>{row.quantity}</TableCell>
-                          <TableCell>Rp {row.purchasePrice}</TableCell>
-                          <TableCell>Rp {row.sellingPrice}</TableCell>
+                          <TableCell>{formatRupiah(row.purchasePrice)}</TableCell>
+                          <TableCell>{formatRupiah(row.sellingPrice)}</TableCell>
                           <TableCell>{row.category}</TableCell>
                           <TableCell>{supplier?.person_name}</TableCell>
                           <TableCell>{moment(row.createdAt).format("DD MMMM YYYY, LT")}</TableCell>

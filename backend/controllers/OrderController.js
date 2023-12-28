@@ -1,6 +1,7 @@
 import { Op, Sequelize } from "sequelize";
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
+import OutboundHistory from "../models/outboundHistoryModel.js"; // Add this line
 
 // Mengambil Data
 export const getOrder = async (req, res) => {
@@ -72,6 +73,14 @@ export const confirmOrder = async (req, res) => {
     if (product.quantity < order.qty) {
       return res.status(400).json({ msg: "Insufficient product qty" });
     }
+
+    // Create Outbound History Entry
+    await OutboundHistory.create({
+      productId: order.productId,
+      quantity: order.qty,
+      total: order.total,
+      status: order.status,
+    });
 
     await product.update({ quantity: product.quantity - order.qty });
     await order.update({ status: "Completed" });

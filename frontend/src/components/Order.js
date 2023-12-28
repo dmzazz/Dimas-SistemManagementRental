@@ -69,8 +69,8 @@ const Order = () => {
         productId: "",
         productPrice: 0,
         qty: "",
-      })
-      handleClose()
+      });
+      handleClose();
     } catch (error) {}
   };
 
@@ -145,6 +145,9 @@ const Order = () => {
     });
   };
 
+  const [search, setSearch] = useState("");
+  const filteredData = data !== null ? data.filter((row) => (row.no && row.no.toLowerCase().includes(search.toLowerCase())) || (row.product.name && row.product.name.toLowerCase().includes(search.toLowerCase()))) : null;
+
   const columns = [
     {
       id: "code",
@@ -172,6 +175,11 @@ const Order = () => {
       minWidth: 70,
     },
     {
+      id: "status",
+      label: "Status",
+      minWidth: 70,
+    },
+    {
       id: "action",
       label: "Action",
       minWidth: 100,
@@ -179,7 +187,7 @@ const Order = () => {
   ];
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -217,13 +225,15 @@ const Order = () => {
             {/* Right */}
             <div className="flex">
               <input
+                onChange={(e) => setSearch(e.target.value)}
+                value={search}
                 type="search"
+                id="search"
+                name="search"
+                placeholder="Search..."
                 className="border-2 border-[#A9A9A9] rounded-md p-1 mr-2 focus:border-black focus:outline-none"
               ></input>
-              <button
-                onClick={handleOpen}
-                className="flex items-center bg-[#489CC1] text-white p-2 rounded-lg hover:bg-[#17B3C1] hover:cursor-pointer duration-300"
-              >
+              <button onClick={handleOpen} className="flex items-center bg-[#489CC1] text-white p-2 rounded-lg hover:bg-[#17B3C1] hover:cursor-pointer duration-300">
                 <RiAddBoxLine size={22} className="mr-1" />
                 Add Order
               </button>
@@ -237,13 +247,7 @@ const Order = () => {
                 <TableHead>
                   <TableRow>
                     {columns.map((column) => (
-                      <TableCell
-                        key={column.id}
-                        align={column.align}
-                        style={{ minWidth: column.minWidth }}
-                        sx={{ backgroundColor: "#489CC1" }}
-                        className="border border-slate-300"
-                      >
+                      <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }} sx={{ backgroundColor: "#489CC1" }} className="border border-slate-300">
                         {column.label}
                       </TableCell>
                     ))}
@@ -252,51 +256,35 @@ const Order = () => {
                 <TableBody>
                   {/*
                    */}
-                  {data &&
-                    data
-                      .slice(
-                        page * rowsPerPage,
-                        page * rowsPerPage + rowsPerPage
-                      )
-                      .map((row) => {
-                        return (
-                          <TableRow key={row.id}>
-                            <TableCell>{row.code}</TableCell>
-                            <TableCell>{row.product.name}</TableCell>
-                            <TableCell>{formatRupiah(row.price)}</TableCell>
-                            <TableCell>{row.qty}</TableCell>
-                            <TableCell>{formatRupiah(row.total)}</TableCell>
-                            <TableCell className="whitespace-nowrap">
-                              <div className="flex">
-                                <button
-                                  onClick={() => handleConfirm(row.id)}
-                                  className="flex items-center bg-[#29A19C] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#47D6B6] hover:cursor-pointer duration-300"
-                                >
-                                  Confirm
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(row.id)}
-                                  className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300"
-                                >
-                                  Delete
-                                </button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
+                  {filteredData &&
+                    filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                      return (
+                        <TableRow key={row.id}>
+                          <TableCell>{row.code}</TableCell>
+                          <TableCell>{row.product.name}</TableCell>
+                          <TableCell>{formatRupiah(row.price)}</TableCell>
+                          <TableCell>{row.qty}</TableCell>
+                          <TableCell>{formatRupiah(row.total)}</TableCell>
+                          <TableCell>
+                            <span className="text-[#D71313] font-bold">{row.status}</span>
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            <div className="flex">
+                              <button onClick={() => handleConfirm(row.id)} className="flex items-center bg-[#29A19C] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#47D6B6] hover:cursor-pointer duration-300">
+                                Confirm
+                              </button>
+                              <button onClick={() => handleDelete(row.id)} className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">
+                                Delete
+                              </button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                 </TableBody>
               </Table>
             </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, 100]}
-              component="div"
-              count={data?.length || 0}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+            <TablePagination rowsPerPageOptions={[5, 10, 25, 100]} component="div" count={data?.length || 0} rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} />
           </Paper>
         </div>
       </div>
@@ -338,15 +326,7 @@ const Order = () => {
                 <div className="flex flex-wrap px-2">
                   <FormControl sx={{ m: 1, width: "53ch", mt: 3 }}>
                     <InputLabel id="product-label">Product</InputLabel>
-                    <Select
-                      labelId="product-label"
-                      id="product"
-                      label="Agesssddddd"
-                      name="productId"
-                      onChange={handleChangeProduct}
-                      value={input.productId}
-                      required
-                    >
+                    <Select labelId="product-label" id="product" label="Agesssddddd" name="productId" onChange={handleChangeProduct} value={input.productId} required>
                       {products.map((p) => (
                         <MenuItem key={p.id} value={p.id}>
                           {p.name}
@@ -355,23 +335,10 @@ const Order = () => {
                     </Select>
                   </FormControl>
                   <FormControl sx={{ m: 1, width: "21ch", mt: 3 }}>
-                    <TextField
-                      label="Price"
-                      id="outlined-start-adornment"
-                      value={formatRupiah(input.productPrice)}
-                      disabled
-                    />
+                    <TextField label="Price" id="outlined-start-adornment" value={formatRupiah(input.productPrice)} disabled />
                   </FormControl>
                   <FormControl sx={{ m: 1, mt: 2 }} fullWidth>
-                    <TextField
-                      label="Quantity"
-                      id="outlined-start-adornment"
-                      type="number"
-                      name="qty"
-                      onChange={handleInput}
-                      value={input.qty}
-                      required
-                    />
+                    <TextField label="Quantity" id="outlined-start-adornment" type="number" name="qty" onChange={handleInput} value={input.qty} required />
                   </FormControl>
                 </div>
                 <Button

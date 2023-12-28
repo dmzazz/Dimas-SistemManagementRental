@@ -12,6 +12,7 @@ import { getSupplier, getSupplierById, createSupplier, updateSupplier, deleteSup
 
 // Import Ordder
 import { confirmOrder, createOrder, deleteOrder, getOrder } from "../controllers/OrderController.js";
+import { getOutboundHistory } from "../controllers/OutboundHistoryController.js";
 
 const router = express.Router();
 
@@ -26,7 +27,7 @@ router.delete("/logout", Logout);
 router.get("/product", getProduct);
 router.get("/product/:id", getProductById);
 router.post("/product", createProduct);
-router.patch("/product/:id", updateProduct);
+router.put("/product/:id", updateProduct);
 router.delete("/product/:id", deleteProduct);
 
 // Router Supplier
@@ -41,5 +42,8 @@ router.get("/order", getOrder);
 router.post("/order", createOrder);
 router.get("/order/confirm/:id", confirmOrder);
 router.delete("/order/:id", deleteOrder);
+
+// Router Outbound
+router.get("/outbound-history", getOutboundHistory);
 
 export default router;

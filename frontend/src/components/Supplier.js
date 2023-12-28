@@ -161,6 +161,10 @@ const Supplier = () => {
     }
   };
 
+  const [search, setSearch] = useState(""); // Search data
+
+  const filteredData = data !== null ? data.filter((row) => (row.no && row.no.toLowerCase().includes(search.toLowerCase())) || (row.person_name && row.person_name.toLowerCase().includes(search.toLowerCase()))) : null;
+
   const columns = [
     { id: "no", label: "NO", minWidth: 70 },
     { id: "namePerson", label: "Name Person", minWidth: 130 },
@@ -186,71 +190,8 @@ const Supplier = () => {
     },
   ];
 
-  // function createData(no, namePerson, email, phone, address, nameSupplier, action) {
-  //   return { no, namePerson, email, phone, address, nameSupplier, action };
-  // }
-
-  // const rows = [
-  //   createData(
-  //     "1",
-  //     "Dimas Azizir",
-  //     "dimasazizir@mail.com",
-  //     "089601768888",
-  //     "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Kec. Cikarang Utara, Kabupaten Bekasi, Jawa Barat 17530",
-  //     "Indosat",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  //   createData(
-  //     "2",
-  //     "Owi",
-  //     "owi@mail.com",
-  //     "089787776666",
-  //     "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Kec. Cikarang Utara, Kabupaten Bekasi, Jawa Barat 17530",
-  //     "Telkomsel",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  //   createData(
-  //     "3",
-  //     "Rakabuming",
-  //     "rakabuming@mail.com",
-  //     "089987789999",
-  //     "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Kec. Cikarang Utara, Kabupaten Bekasi, Jawa Barat 17530",
-  //     "XL",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  //   createData(
-  //     "4",
-  //     "Saturn",
-  //     "saturn@mail.com",
-  //     "099987876666",
-  //     "Jababeka Education Park, Jl. Ki Hajar Dewantara, RT.2/RW.4, Mekarmukti, Kec. Cikarang Utara, Kabupaten Bekasi, Jawa Barat 17530",
-  //     "Agen Jababeka",
-  //     <>
-  //       <div className="flex">
-  //         <button className="flex items-center bg-[#F2BE22] text-white mr-2 px-4 py-2 rounded-lg hover:bg-[#FFE569] hover:cursor-pointer duration-300">Edit</button>
-  //         <button className="flex items-center bg-[#D71313] text-white px-4 py-2 rounded-lg hover:bg-[#F31559] hover:cursor-pointer duration-300">Delete</button>
-  //       </div>
-  //     </>
-  //   ),
-  // ];
-
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -287,7 +228,15 @@ const Supplier = () => {
 
             {/* Right */}
             <div className="flex">
-              <input type="search" className="border-2 border-[#A9A9A9] rounded-md p-1 mr-2 focus:border-black focus:outline-none"></input>
+              <input
+                onChange={(e) => setSearch(e.target.value)}
+                value={search}
+                type="search"
+                id="search"
+                name="search"
+                placeholder="Search..."
+                className="border-2 border-[#A9A9A9] rounded-md p-1 mr-2 focus:border-black focus:outline-none"
+              ></input>
               <button onClick={handleOpen} className="flex items-center bg-[#28CC9E] text-white p-2 rounded-lg hover:bg-[#9FF9C1] hover:cursor-pointer duration-300">
                 <RiAddBoxLine size={22} className="mr-1" />
                 Add Supplier
@@ -309,8 +258,8 @@ const Supplier = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {data &&
-                    data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => {
+                  {filteredData &&
+                    filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => {
                       return (
                         <TableRow key={row.id}>
                           <TableCell>{index + 1}</TableCell>

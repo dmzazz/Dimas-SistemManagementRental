@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 import db from "../config/Database.js";
 import Product from "./productModel.js";
+import OutboundHistory from "./outboundHistoryModel.js"; // Add this line
 
 const { DataTypes } = Sequelize;
 
@@ -31,10 +32,10 @@ const Order = db.define(
   }
 );
 
-Order.belongsTo(Product, {foreignKey: 'productId'})
+Order.belongsTo(Product, { foreignKey: "productId" });
+Order.hasMany(OutboundHistory, { foreignKey: "orderId"}); // Add this line
 
 export default Order;
-
 
 // (async () => {
 //   await db.sync();
